@@ -303,7 +303,7 @@ const ProfilePage = () => {
                   查看预约、接单管理、数据统计
                 </Text>
               </View>
-              <View className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+              <View className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
                 <TrendingUp size={20} color="#FFFFFF" />
               </View>
             </CardContent>
