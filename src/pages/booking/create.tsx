@@ -111,11 +111,24 @@ const BookingPage = () => {
 
     setSubmitting(true)
     try {
-      // 获取或生成用户标识（真实环境应使用微信 openid）
-      let userId = Taro.getStorageSync('userId')
+      // 获取登录用户的 userId
+      const userStr = Taro.getStorageSync('user_info')
+      let userId = ''
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr)
+          userId = user.id || user.openid || ''
+        } catch (e) {
+          console.error('解析用户信息失败:', e)
+        }
+      }
+      // 如果未登录，使用本地生成的 userId（降级处理）
       if (!userId) {
-        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8)
-        Taro.setStorageSync('userId', userId)
+        userId = Taro.getStorageSync('userId')
+        if (!userId) {
+          userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8)
+          Taro.setStorageSync('userId', userId)
+        }
       }
 
       const res = await Network.request({

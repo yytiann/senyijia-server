@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from '@tarojs/components'
+import { View, Text, ScrollView, Image } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
@@ -57,12 +57,28 @@ const ProfilePage = () => {
   const [orders, setOrders] = useState<Booking[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('all')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userInfo, setUserInfo] = useState<{ nickname: string; avatar: string } | null>(null)
 
   const fetchOrders = useCallback(async () => {
     setLoading(true)
     try {
-      // 获取用户标识，只查询该用户的预约
-      const userId = Taro.getStorageSync('userId')
+      // 获取登录用户的 userId
+      const userStr = Taro.getStorageSync('user_info')
+      let userId = ''
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr)
+          userId = user.id || user.openid || ''
+        } catch (e) {
+          console.error('解析用户信息失败:', e)
+        }
+      }
+      // 如果未登录，使用本地 userId（降级处理）
+      if (!userId) {
+        userId = Taro.getStorageSync('userId')
+      }
+
       const res = await Network.request({
         url: '/api/bookings',
         method: 'GET',
@@ -78,10 +94,77 @@ const ProfilePage = () => {
     }
   }, [])
 
-  // 页面加载时获取订单
-  useEffect(() => {
-    fetchOrders()
+  // 检查登录状态
+  const checkLoginStatus = useCallback(() => {
+    const userStr = Taro.getStorageSync('user_info')
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr)
+        setIsLoggedIn(true)
+        setUserInfo(user)
+      } catch (e) {
+        setIsLoggedIn(false)
+        setUserInfo(null)
+      }
+    } else {
+      setIsLoggedIn(false)
+      setUserInfo(null)
+    }
+  }, [])
+
+  // 登录函数
+  const handleLogin = useCallback(async () => {
+    try {
+      // 判断环境
+      const env = Taro.getEnv()
+      const isMiniApp = env === Taro.ENV_TYPE.WEAPP || env === Taro.ENV_TYPE.TT
+
+      let code = ''
+      if (isMiniApp) {
+        // 小程序环境：调用微信登录
+        const loginRes = await Taro.login()
+        code = loginRes.code
+      } else {
+        // H5 环境：使用模拟登录
+        code = `mock_h5_${Date.now()}`
+      }
+
+      if (!code) {
+        Taro.showToast({ title: '登录失败', icon: 'none' })
+        return
+      }
+
+      const res = await Network.request({
+        url: '/api/auth/login',
+        method: 'POST',
+        data: { code, nickname: '', avatar: '' }
+      })
+
+      console.log('登录响应:', res.data)
+
+      const data = res.data?.data
+      if (data?.token && data?.user) {
+        Taro.setStorageSync('auth_token', data.token)
+        Taro.setStorageSync('user_info', JSON.stringify(data.user))
+        setIsLoggedIn(true)
+        setUserInfo(data.user)
+        Taro.showToast({ title: '登录成功', icon: 'success' })
+        // 登录后重新获取订单
+        fetchOrders()
+      } else {
+        Taro.showToast({ title: '登录失败', icon: 'none' })
+      }
+    } catch (error) {
+      console.error('登录失败:', error)
+      Taro.showToast({ title: '登录失败', icon: 'none' })
+    }
   }, [fetchOrders])
+
+  // 页面加载时检查登录状态并获取订单
+  useEffect(() => {
+    checkLoginStatus()
+    fetchOrders()
+  }, [checkLoginStatus, fetchOrders])
 
   // 页面每次显示时刷新订单（TabBar 切换回来时）
   useDidShow(() => {
@@ -145,15 +228,36 @@ const ProfilePage = () => {
         {/* 用户信息头部 */}
         <View className="bg-white px-4 pt-6 pb-5">
           <View className="flex items-center gap-3">
-            <View className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center">
-              <User size={28} color="#0D9488" />
-            </View>
-            <View className="flex-1">
-              <Text className="block text-lg font-bold text-slate-800">森易家用户</Text>
-              <Text className="block text-xs text-slate-400 mt-1">
-                专业室内环境治理服务
-              </Text>
-            </View>
+            {isLoggedIn && userInfo ? (
+              <>
+                <View className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center overflow-hidden">
+                  {userInfo.avatar ? (
+                    <Image src={userInfo.avatar} className="w-full h-full" mode="aspectFill" />
+                  ) : (
+                    <User size={28} color="#0D9488" />
+                  )}
+                </View>
+                <View className="flex-1">
+                  <Text className="block text-lg font-bold text-slate-800">{userInfo.nickname || '微信用户'}</Text>
+                  <Text className="block text-xs text-slate-400 mt-1">
+                    已登录，可查看所有预约
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <>
+                <View className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center">
+                  <User size={28} color="#94A3B8" />
+                </View>
+                <View className="flex-1">
+                  <Text className="block text-lg font-bold text-slate-800">未登录</Text>
+                  <Text className="block text-xs text-slate-400 mt-1">
+                    登录后即可查看您的预约记录
+                  </Text>
+                </View>
+                <Button size="sm" onClick={handleLogin}>登录</Button>
+              </>
+            )}
           </View>
         </View>
 
