@@ -1,11 +1,46 @@
-export default defineAppConfig({
+const appConfig = {
   pages: [
-    'pages/index/index'
+    'pages/index/index',
+    'pages/booking/create',
+    'pages/profile/index',
+    'pages/service/detail',
+    'pages/order/detail',
+    'pages/about/index'
   ],
   window: {
     backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#fff',
-    navigationBarTitleText: 'WeChat',
+    navigationBarBackgroundColor: '#FFFFFF',
+    navigationBarTitleText: '森易家',
     navigationBarTextStyle: 'black'
+  },
+  tabBar: {
+    color: '#94A3B8',
+    selectedColor: '#0D9488',
+    backgroundColor: '#FFFFFF',
+    borderStyle: 'white' as const,
+    list: [
+      {
+        pagePath: 'pages/index/index',
+        text: '首页',
+        iconPath: './assets/tabbar/house.png',
+        selectedIconPath: './assets/tabbar/house-active.png'
+      },
+      {
+        pagePath: 'pages/booking/create',
+        text: '预约',
+        iconPath: './assets/tabbar/calendar.png',
+        selectedIconPath: './assets/tabbar/calendar-active.png'
+      },
+      {
+        pagePath: 'pages/profile/index',
+        text: '我的',
+        iconPath: './assets/tabbar/user.png',
+        selectedIconPath: './assets/tabbar/user-active.png'
+      }
+    ]
   }
-})
+}
+
+export default typeof defineAppConfig === 'function'
+  ? defineAppConfig(appConfig)
+  : appConfig
