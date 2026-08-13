@@ -7,7 +7,8 @@ const appConfig = {
     'pages/order/detail',
     'pages/about/index',
     'pages/admin/index',
-    'pages/admin/login'
+    'pages/admin/login',
+    'pages/admin-web/index'
   ],
   window: {
     backgroundTextStyle: 'light',
