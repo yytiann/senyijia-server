@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
-import { useState, useCallback } from 'react'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { useState, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -14,7 +14,8 @@ import {
   Clock,
   CircleCheck,
   CircleX,
-  CircleAlert
+  CircleAlert,
+  TrendingUp
 } from 'lucide-react-taro'
 import { Network } from '@/network'
 
@@ -75,7 +76,12 @@ const ProfilePage = () => {
   }, [])
 
   // 页面加载时获取订单
-  useState(() => {
+  useEffect(() => {
+    fetchOrders()
+  }, [fetchOrders])
+
+  // 页面每次显示时刷新订单（TabBar 切换回来时）
+  useDidShow(() => {
     fetchOrders()
   })
 
@@ -175,6 +181,26 @@ const ProfilePage = () => {
               )
             })}
           </View>
+        </View>
+
+        {/* 商户管理入口 */}
+        <View className="px-4 mt-3">
+          <Card
+            className="border-0 shadow-none bg-gradient-to-r from-teal-600 to-teal-700 cursor-pointer"
+            onClick={() => Taro.navigateTo({ url: '/pages/admin/index' })}
+          >
+            <CardContent className="p-4 flex items-center justify-between">
+              <View>
+                <Text className="block text-base font-bold text-white">商户管理后台</Text>
+                <Text className="block text-xs text-white text-opacity-80 mt-1">
+                  查看预约、接单管理、数据统计
+                </Text>
+              </View>
+              <View className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                <TrendingUp size={20} color="#FFFFFF" />
+              </View>
+            </CardContent>
+          </Card>
         </View>
 
         {/* 订单列表 */}
