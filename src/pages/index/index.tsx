@@ -38,13 +38,13 @@ const SERVICES = [
   {
     id: 'comprehensive',
     name: '环境综合治理',
-    desc: 'TVOC/苯系物全面治理',
+    desc: 'TVOC/苯系物/异味全面治理',
     icon: Sparkles,
     color: '#8B5CF6'
   },
   {
     id: 'detection',
-    name: '空气检测服务',
+    name: '环境检测服务',
     desc: 'CMA标准专业检测',
     icon: ThermometerSun,
     color: '#F59E0B'
@@ -125,7 +125,7 @@ const IndexPage = () => {
             <View className="flex-1">
               <Text className="block text-xl font-bold text-slate-800">森易家</Text>
               <Text className="block text-xs text-slate-400 mt-1">
-                专业室内环境治理 · 消杀除醛净化专家
+                专业环境治理 · 消杀除醛净化专家
               </Text>
             </View>
           </View>

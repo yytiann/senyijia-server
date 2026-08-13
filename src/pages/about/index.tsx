@@ -30,7 +30,7 @@ const AboutPage = () => {
           </View>
           <Text className="block text-xl font-bold text-slate-800">森易家</Text>
           <Text className="block text-sm text-slate-400 mt-1">
-            专业室内环境治理 · 消杀除醛净化专家
+            专业环境治理 · 消杀除醛净化专家
           </Text>
         </View>
 
@@ -40,10 +40,11 @@ const AboutPage = () => {
             <CardContent className="p-4">
               <Text className="block text-base font-bold text-slate-800 mb-3">关于我们</Text>
               <Text className="text-sm text-slate-600 leading-relaxed">
-                森易家环境科技有限公司是一家专注于室内空气质量治理的专业服务企业，
-                致力于为家庭和企业提供科学、安全、高效的室内环境治理解决方案。
+                森易家环境科技有限公司是一家专注于环境治理的专业服务企业，
+                致力于为家庭和企业提供科学、安全、高效的环境治理解决方案。
                 公司拥有CMA认证检测资质，采用国际先进的治理技术和环保药剂，
-                服务覆盖除甲醛、全屋消杀、环境综合治理、空气检测等多个领域。
+                服务覆盖除甲醛、全屋消杀、环境综合治理、环境检测等多个领域，
+                业务涵盖室内空间、商业场所、公共区域等多种场景。
               </Text>
             </CardContent>
           </Card>

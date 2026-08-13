@@ -35,7 +35,7 @@ const SERVICE_MAP: Record<string, ServiceInfo> = {
   formaldehyde: {
     id: 'formaldehyde',
     name: '除甲醛治理',
-    desc: '针对新房装修后甲醛超标问题，采用光触媒+生物酶复合技术，从源头分解甲醛分子，治理后空气质量达到国家标准GB/T 18883-2002。',
+    desc: '针对装修后甲醛超标问题，采用光触媒+生物酶复合技术，从源头分解甲醛分子，治理后空气质量达到国家标准GB/T 18883-2002。适用于住宅、办公室、商业空间等各类场所。',
     icon: Wind,
     color: '#0D9488',
     scenes: ['新房装修', '二手房翻新', '新家具进场', '办公区装修', '商铺精装'],
@@ -47,7 +47,7 @@ const SERVICE_MAP: Record<string, ServiceInfo> = {
   disinfection: {
     id: 'disinfection',
     name: '全屋消杀消毒',
-    desc: '采用医用级消毒设备与环保消毒剂，对室内空间进行全方位消杀，有效灭杀细菌、病毒、霉菌等有害微生物，营造健康安全的室内环境。',
+    desc: '采用医用级消毒设备与环保消毒剂，对空间进行全方位消杀，有效灭杀细菌、病毒、霉菌等有害微生物，营造健康安全的环境。适用于住宅、办公室、学校、医院等各类场所。',
     icon: Droplets,
     color: '#0EA5E9',
     scenes: ['家庭全屋消毒', '办公区域消杀', '商铺门店消毒', '仓储空间处理', '疫情后消杀'],
@@ -58,8 +58,8 @@ const SERVICE_MAP: Record<string, ServiceInfo> = {
   },
   comprehensive: {
     id: 'comprehensive',
-    name: '室内环境综合治理',
-    desc: '针对室内空气中甲醛、苯系物、TVOC、异味等多种污染物进行综合检测与治理，采用多种技术组合方案，全面改善室内空气质量。',
+    name: '环境综合治理',
+    desc: '针对空气中甲醛、苯系物、TVOC、异味等多种污染物进行综合检测与治理，采用多种技术组合方案，全面改善空气质量。适用于住宅、办公室、商业空间、公共区域等各类场所。',
     icon: Sparkles,
     color: '#8B5CF6',
     scenes: ['新房全面治理', '办公室空气改善', '商铺异味处理', '学校教室治理', '医院病房净化'],
@@ -70,8 +70,8 @@ const SERVICE_MAP: Record<string, ServiceInfo> = {
   },
   detection: {
     id: 'detection',
-    name: '空气检测服务',
-    desc: '采用专业检测仪器，按照国家标准方法对室内空气中甲醛、苯、TVOC等指标进行精准检测，出具权威检测报告，为治理提供科学依据。',
+    name: '环境检测服务',
+    desc: '采用专业检测仪器，按照国家标准方法对空气中甲醛、苯、TVOC等指标进行精准检测，出具权威检测报告，为治理提供科学依据。适用于各类室内外环境。',
     icon: ThermometerSun,
     color: '#F59E0B',
     scenes: ['装修后检测', '入住前检测', '治理后验收', '定期环境监测', '办公环境评估'],

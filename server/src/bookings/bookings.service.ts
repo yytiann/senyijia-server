@@ -42,8 +42,8 @@ export class BookingsService {
   private serviceItems: ServiceItem[] = [
     { id: 'formaldehyde', name: '除甲醛治理', description: '新房/二手房专业除醛', enabled: true },
     { id: 'disinfection', name: '全屋消杀消毒', description: '深度杀菌·安全无害', enabled: true },
-    { id: 'comprehensive', name: '室内环境综合治理', description: 'TVOC/苯系物全面治理', enabled: true },
-    { id: 'detection', name: '空气检测服务', description: 'CMA标准专业检测', enabled: true },
+    { id: 'comprehensive', name: '环境综合治理', description: 'TVOC/苯系物/异味全面治理', enabled: true },
+    { id: 'detection', name: '环境检测服务', description: 'CMA标准专业检测', enabled: true },
   ];
 
   private settings: AppSettings = {
