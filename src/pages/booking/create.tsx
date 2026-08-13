@@ -111,10 +111,18 @@ const BookingPage = () => {
 
     setSubmitting(true)
     try {
+      // 获取或生成用户标识（真实环境应使用微信 openid）
+      let userId = Taro.getStorageSync('userId')
+      if (!userId) {
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8)
+        Taro.setStorageSync('userId', userId)
+      }
+
       const res = await Network.request({
         url: '/api/bookings',
         method: 'POST',
         data: {
+          userId,
           serviceType,
           venueType,
           area: parseFloat(area),

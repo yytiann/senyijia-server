@@ -76,6 +76,7 @@ export class BookingsController {
   @Post()
   @HttpCode(HttpStatus.OK)
   create(@Body() body: {
+    userId?: string;
     serviceType: string;
     venueType: string;
     area: number;
@@ -91,10 +92,17 @@ export class BookingsController {
     return { code: 200, msg: '预约提交成功', data: booking };
   }
 
-  // 获取预约列表
+  // 获取预约列表（支持按用户筛选）
   @Get()
-  findAll(@Query('status') status?: string, @Query('date') date?: string, @Query('serviceType') serviceType?: string) {
-    const bookings = this.bookingsService.getAllBookings({ status, date, serviceType });
+  findAll(
+    @Query('userId') userId?: string,
+    @Query('status') status?: string,
+    @Query('date') date?: string,
+    @Query('serviceType') serviceType?: string
+  ) {
+    // 如果传入了 userId，则只返回该用户的预约（用户端）
+    // 如果没有传入 userId，则返回所有预约（商户端）
+    const bookings = this.bookingsService.getAllBookings({ userId, status, date, serviceType });
     return { code: 200, msg: 'success', data: bookings };
   }
 

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 export interface Booking {
   id: number;
+  userId: string; // 用户标识（openid 或自定义 userId）
   serviceType: string;
   venueType: string;
   area: number;
@@ -54,6 +55,7 @@ export class BookingsService {
     const now = new Date().toISOString();
     const booking: Booking = {
       id: this.nextId++,
+      userId: data.userId || 'anonymous',
       serviceType: data.serviceType || '',
       venueType: data.venueType || '',
       area: data.area || 0,
@@ -73,9 +75,13 @@ export class BookingsService {
     return booking;
   }
 
-  // 获取所有预约（支持筛选）
-  getAllBookings(filters?: { status?: string; date?: string; serviceType?: string }): Booking[] {
+  // 获取所有预约（支持筛选）- 商户端使用，查看所有预约
+  getAllBookings(filters?: { status?: string; date?: string; serviceType?: string; userId?: string }): Booking[] {
     let result = [...this.bookings];
+    // 如果指定了 userId，则只返回该用户的预约（用户端使用）
+    if (filters?.userId) {
+      result = result.filter((b) => b.userId === filters.userId);
+    }
     if (filters?.status) {
       result = result.filter((b) => b.status === filters.status);
     }

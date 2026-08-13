@@ -61,9 +61,12 @@ const ProfilePage = () => {
   const fetchOrders = useCallback(async () => {
     setLoading(true)
     try {
+      // 获取用户标识，只查询该用户的预约
+      const userId = Taro.getStorageSync('userId')
       const res = await Network.request({
         url: '/api/bookings',
-        method: 'GET'
+        method: 'GET',
+        data: { userId }
       })
       console.log('订单列表:', res.data)
       const data = res.data?.data || res.data || []
