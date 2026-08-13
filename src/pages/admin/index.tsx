@@ -227,18 +227,18 @@ const AdminPage = () => {
       {/* 统计卡片 */}
       <View className="bg-gradient-to-br from-teal-600 to-teal-700 px-4 pt-8 pb-6">
         <Text className="block text-xl font-bold text-white mb-4">数据概览</Text>
-        <View className="grid grid-cols-3 gap-3">
-          <View className="bg-white bg-opacity-20 backdrop-blur rounded-xl p-3 text-center">
+        <View className="flex flex-row gap-3">
+          <View className="flex-1 rounded-xl p-3 text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
             <Text className="block text-2xl font-bold text-white">{statistics.total}</Text>
-            <Text className="block text-xs text-white text-opacity-80 mt-1">总预约</Text>
+            <Text className="block text-xs text-white mt-1">总预约</Text>
           </View>
-          <View className="bg-white bg-opacity-20 backdrop-blur rounded-xl p-3 text-center">
+          <View className="flex-1 rounded-xl p-3 text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
             <Text className="block text-2xl font-bold text-white">{statistics.pending}</Text>
-            <Text className="block text-xs text-white text-opacity-80 mt-1">待处理</Text>
+            <Text className="block text-xs text-white mt-1">待处理</Text>
           </View>
-          <View className="bg-white bg-opacity-20 backdrop-blur rounded-xl p-3 text-center">
+          <View className="flex-1 rounded-xl p-3 text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
             <Text className="block text-2xl font-bold text-white">{statistics.completed}</Text>
-            <Text className="block text-xs text-white text-opacity-80 mt-1">已完成</Text>
+            <Text className="block text-xs text-white mt-1">已完成</Text>
           </View>
         </View>
       </View>
