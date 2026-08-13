@@ -115,7 +115,18 @@ const AdminPage = () => {
       console.log('统计数据:', res.data)
       const data = res.data?.data || res.data
       if (data) {
-        setStatistics(data)
+        // 解析后端返回的数据结构
+        const byStatus = data.byStatus || {}
+        setStatistics({
+          total: data.total || 0,
+          pending: byStatus.pending || 0,
+          confirmed: byStatus.confirmed || 0,
+          scheduled: byStatus.scheduled || 0,
+          inService: byStatus.in_service || 0,
+          completed: byStatus.completed || 0,
+          cancelled: byStatus.cancelled || 0,
+          byService: data.byService || {}
+        })
       }
     } catch (err) {
       console.error('获取统计失败:', err)
