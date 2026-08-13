@@ -15,11 +15,41 @@ export interface LoginResult {
   user: User;
 }
 
+export interface Admin {
+  id: string;
+  username: string;
+  password: string;
+  name: string;
+  role: 'admin' | 'operator';
+  createdAt: string;
+}
+
+export interface AdminLoginResult {
+  token: string;
+  admin: Omit<Admin, 'password'>;
+}
+
 @Injectable()
 export class AuthService {
   // 内存存储用户和 token
   private users: Map<string, User> = new Map(); // openid -> User
   private tokens: Map<string, string> = new Map(); // token -> openid
+  
+  // 商户存储
+  private admins: Map<string, Admin> = new Map(); // username -> Admin
+  private adminTokens: Map<string, string> = new Map(); // token -> username
+
+  constructor() {
+    // 初始化默认商户账号
+    this.admins.set('admin', {
+      id: 'admin_001',
+      username: 'admin',
+      password: 'admin123', // 生产环境应该加密存储
+      name: '森易家管理员',
+      role: 'admin',
+      createdAt: new Date().toISOString(),
+    });
+  }
 
   /**
    * 微信登录
@@ -124,5 +154,43 @@ export class AuthService {
    */
   logout(token: string): void {
     this.tokens.delete(token);
+  }
+
+  /**
+   * 商户登录
+   */
+  async adminLogin(username: string, password: string): Promise<AdminLoginResult | null> {
+    const admin = this.admins.get(username);
+    if (!admin || admin.password !== password) {
+      return null;
+    }
+
+    // 生成 token
+    const token = this.generateToken();
+    this.adminTokens.set(token, username);
+
+    // 返回不含密码的商户信息
+    const { password: _, ...adminInfo } = admin;
+    return { token, admin: adminInfo };
+  }
+
+  /**
+   * 验证商户 token
+   */
+  verifyAdminToken(token: string): Omit<Admin, 'password'> | null {
+    const username = this.adminTokens.get(token);
+    if (!username) return null;
+    const admin = this.admins.get(username);
+    if (!admin) return null;
+    
+    const { password: _, ...adminInfo } = admin;
+    return adminInfo;
+  }
+
+  /**
+   * 商户登出
+   */
+  adminLogout(token: string): void {
+    this.adminTokens.delete(token);
   }
 }

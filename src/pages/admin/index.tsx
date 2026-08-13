@@ -91,6 +91,14 @@ const AdminPage = () => {
     byService: {}
   })
 
+  // 检查登录状态
+  useDidShow(() => {
+    const token = Taro.getStorageSync('admin_token')
+    if (!token) {
+      Taro.redirectTo({ url: '/pages/admin/login' })
+    }
+  })
+
   const fetchOrders = useCallback(async () => {
     setLoading(true)
     try {

@@ -294,13 +294,13 @@ const ProfilePage = () => {
         <View className="px-4 mt-3">
           <Card
             className="border-0 shadow-none bg-gradient-to-r from-teal-600 to-teal-700 cursor-pointer"
-            onClick={() => Taro.navigateTo({ url: '/pages/admin/index' })}
+            onClick={() => Taro.navigateTo({ url: '/pages/admin/login' })}
           >
             <CardContent className="p-4 flex items-center justify-between">
               <View>
                 <Text className="block text-base font-bold text-white">商户管理后台</Text>
                 <Text className="block text-xs text-white text-opacity-80 mt-1">
-                  查看预约、接单管理、数据统计
+                  商户登录进入管理系统
                 </Text>
               </View>
               <View className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
