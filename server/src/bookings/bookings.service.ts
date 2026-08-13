@@ -15,6 +15,8 @@ export interface Booking {
   remark: string;
   status: 'pending' | 'confirmed' | 'scheduled' | 'in_service' | 'completed' | 'cancelled';
   adminRemark: string;
+  scheduleStartTime?: string; // 排期开始时间
+  scheduleDuration?: number; // 服务时长（小时）
   createdAt: string;
   updatedAt: string;
 }
@@ -119,12 +121,18 @@ export class BookingsService {
     return booking;
   }
 
-  // 修改预约时间
-  updateBookingDate(id: number, bookingDate: string, timeSlot: string): Booking | null {
+  // 修改预约时间/排期
+  updateBookingDate(id: number, bookingDate: string, timeSlot: string, scheduleStartTime?: string, scheduleDuration?: number): Booking | null {
     const booking = this.bookings.find((b) => b.id === id);
     if (!booking) return null;
     booking.bookingDate = bookingDate;
     booking.timeSlot = timeSlot;
+    if (scheduleStartTime !== undefined) {
+      booking.scheduleStartTime = scheduleStartTime;
+    }
+    if (scheduleDuration !== undefined) {
+      booking.scheduleDuration = scheduleDuration;
+    }
     booking.updatedAt = new Date().toISOString();
     return booking;
   }

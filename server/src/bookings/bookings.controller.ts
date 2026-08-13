@@ -130,8 +130,14 @@ export class BookingsController {
   // 排期
   @Post(':id/schedule')
   @HttpCode(HttpStatus.OK)
-  schedule(@Param('id') id: string, @Body() body: { bookingDate: string; timeSlot: string }) {
-    const booking = this.bookingsService.updateBookingDate(Number(id), body.bookingDate, body.timeSlot);
+  schedule(@Param('id') id: string, @Body() body: { bookingDate: string; timeSlot: string; scheduleStartTime?: string; scheduleDuration?: number }) {
+    const booking = this.bookingsService.updateBookingDate(
+      Number(id),
+      body.bookingDate,
+      body.timeSlot,
+      body.scheduleStartTime,
+      body.scheduleDuration
+    );
     if (!booking) {
       return { code: 404, msg: '订单不存在', data: null };
     }

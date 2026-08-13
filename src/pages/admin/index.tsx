@@ -60,6 +60,8 @@ interface Booking {
   address: string
   remark: string
   status: string
+  scheduleStartTime?: string
+  scheduleDuration?: number
   createdAt: string
 }
 
@@ -161,6 +163,9 @@ const AdminPage = () => {
 
   const [scheduleDate, setScheduleDate] = useState('')
   const [scheduleOrderId, setScheduleOrderId] = useState<number | null>(null)
+  const [scheduleStartTime, setScheduleStartTime] = useState('09:00')
+  const [scheduleDuration, setScheduleDuration] = useState(2)
+  const [currentBooking, setCurrentBooking] = useState<Booking | null>(null)
 
   const confirmOrder = async (orderId: number) => {
     try {
@@ -177,14 +182,23 @@ const AdminPage = () => {
     }
   }
 
-  const openScheduleModal = (orderId: number) => {
-    setScheduleOrderId(orderId)
-    setScheduleDate('')
+  const openScheduleModal = (order: Booking) => {
+    setScheduleOrderId(order.id)
+    setCurrentBooking(order)
+    // 默认使用客户预约的日期
+    setScheduleDate(order.bookingDate || '')
+    // 默认开始时间 09:00，时长 2 小时
+    setScheduleStartTime('09:00')
+    setScheduleDuration(2)
   }
 
   const submitSchedule = async () => {
     if (!scheduleOrderId || !scheduleDate) {
-      Taro.showToast({ title: '请输入排期日期', icon: 'none' })
+      Taro.showToast({ title: '请选择排期日期', icon: 'none' })
+      return
+    }
+    if (!scheduleStartTime) {
+      Taro.showToast({ title: '请选择开始时间', icon: 'none' })
       return
     }
     try {
@@ -193,11 +207,14 @@ const AdminPage = () => {
         method: 'POST',
         data: {
           bookingDate: scheduleDate,
-          timeSlot: 'morning'
+          timeSlot: 'morning',
+          scheduleStartTime: scheduleStartTime,
+          scheduleDuration: scheduleDuration
         }
       })
       Taro.showToast({ title: '已排期', icon: 'success' })
       setScheduleOrderId(null)
+      setCurrentBooking(null)
       fetchOrders()
       fetchStatistics()
     } catch {
@@ -360,7 +377,7 @@ const AdminPage = () => {
                               <Button
                                 size="sm"
                                 className="flex-1 bg-purple-600 hover:bg-purple-700"
-                                onClick={() => openScheduleModal(order.id)}
+                                onClick={() => openScheduleModal(order)}
                               >
                                 <Calendar size={14} color="#FFFFFF" className="mr-1" />
                                 排期
@@ -423,16 +440,75 @@ const AdminPage = () => {
       <Dialog open={scheduleOrderId !== null} onOpenChange={(open) => !open && setScheduleOrderId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>设置排期日期</DialogTitle>
+            <DialogTitle>设置排期</DialogTitle>
           </DialogHeader>
-          <View className="py-4">
-            <View className="bg-slate-50 rounded-xl px-4 py-3">
-              <Input
-                className="w-full bg-transparent"
-                placeholder="请输入日期，如 2026-08-20"
-                value={scheduleDate}
-                onInput={(e) => setScheduleDate(e.detail.value)}
-              />
+          <View className="py-4 space-y-4">
+            {/* 客户预约信息 */}
+            {currentBooking && (
+              <View className="bg-slate-50 rounded-xl p-4">
+                <Text className="block text-sm font-medium text-slate-700 mb-2">客户预约信息</Text>
+                <Text className="block text-sm text-slate-600">预约日期：{currentBooking.bookingDate}</Text>
+                <Text className="block text-sm text-slate-600">服务类型：{SERVICE_NAME_MAP[currentBooking.serviceType] || currentBooking.serviceType}</Text>
+                <Text className="block text-sm text-slate-600">面积：{currentBooking.area}㎡</Text>
+              </View>
+            )}
+
+            {/* 排期日期 */}
+            <View>
+              <Text className="block text-sm font-medium text-slate-700 mb-2">排期日期</Text>
+              <View className="bg-slate-50 rounded-xl px-4 py-3">
+                <Input
+                  className="w-full bg-transparent"
+                  placeholder="请选择日期"
+                  value={scheduleDate}
+                  onInput={(e) => setScheduleDate(e.detail.value)}
+                />
+              </View>
+            </View>
+
+            {/* 开始时间 */}
+            <View>
+              <Text className="block text-sm font-medium text-slate-700 mb-2">开始时间</Text>
+              <View className="bg-slate-50 rounded-xl px-4 py-3">
+                <Input
+                  className="w-full bg-transparent"
+                  placeholder="如 09:00"
+                  value={scheduleStartTime}
+                  onInput={(e) => setScheduleStartTime(e.detail.value)}
+                />
+              </View>
+            </View>
+
+            {/* 服务时长 */}
+            <View>
+              <Text className="block text-sm font-medium text-slate-700 mb-2">服务时长</Text>
+              <View className="flex gap-2">
+                {[2, 3, 4, 5, 6].map((hours) => (
+                  <Button
+                    key={hours}
+                    size="sm"
+                    variant={scheduleDuration === hours ? 'default' : 'outline'}
+                    className={scheduleDuration === hours ? 'bg-teal-600' : ''}
+                    onClick={() => setScheduleDuration(hours)}
+                  >
+                    {hours}小时
+                  </Button>
+                ))}
+              </View>
+            </View>
+
+            {/* 预计结束时间 */}
+            <View className="bg-teal-50 rounded-xl p-4">
+              <Text className="block text-sm font-medium text-teal-700 mb-1">预计结束时间</Text>
+              <Text className="block text-lg font-bold text-teal-600">
+                {scheduleStartTime && scheduleDuration
+                  ? (() => {
+                      const [h, m] = scheduleStartTime.split(':').map(Number)
+                      const endH = h + scheduleDuration
+                      return `${String(endH).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+                    })()
+                  : '--:--'}
+              </Text>
             </View>
           </View>
           <DialogFooter>
