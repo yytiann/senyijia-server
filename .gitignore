@@ -36,8 +36,10 @@ pnpm-debug.log*
 # OS X
 .DS_Store
 
-# Key
-# key/
+# Key (微信上传私钥等敏感文件，严禁入库)
+key/
+assets/private.*.key
+*.key
 
 # Preview files
 .preview
