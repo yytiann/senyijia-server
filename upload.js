@@ -40,10 +40,12 @@ ci.upload({
   version: VERSION,
   desc: DESC,
   setting: {
-    es6: true,
-    es7: true,
-    minify: true,
-    autoPrefixWXSS: true,
+    // Taro 已编译完成，上传时关闭二次编译，避免与产物冲突
+    es6: false,
+    es7: false,
+    minify: false,
+    autoPrefixWXSS: false,
+    ignoreUploadUnusedFiles: true,
   },
 })
   .then(() => {
