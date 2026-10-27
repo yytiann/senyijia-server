@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "森易家商户管理后台",
+  "usingComponents": {
+    "comp": "../../comp"
+  }
+}

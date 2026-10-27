@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "森易家 - 专业室内环境治理",
+  "usingComponents": {
+    "comp": "../../comp"
+  }
+}
