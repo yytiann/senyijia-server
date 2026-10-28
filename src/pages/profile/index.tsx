@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import UserProfileEditor from '@/components/user-profile-editor'
 import {
   User,
   FileText,
@@ -59,6 +60,10 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('all')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userInfo, setUserInfo] = useState<{ nickname: string; avatar: string } | null>(null)
+  const [editing, setEditing] = useState(false)
+
+  // 判断是否小程序环境（直接判断，避免状态延迟导致白屏）
+  const isMiniApp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP || Taro.getEnv() === Taro.ENV_TYPE.TT
 
   const fetchOrders = useCallback(async () => {
     setLoading(true)
@@ -116,9 +121,6 @@ const ProfilePage = () => {
   const handleLogin = useCallback(async () => {
     try {
       // 判断环境
-      const env = Taro.getEnv()
-      const isMiniApp = env === Taro.ENV_TYPE.WEAPP || env === Taro.ENV_TYPE.TT
-
       let code = ''
       if (isMiniApp) {
         // 小程序环境：调用微信登录
@@ -159,6 +161,41 @@ const ProfilePage = () => {
       Taro.showToast({ title: '登录失败', icon: 'none' })
     }
   }, [fetchOrders])
+
+  // 打开编辑资料
+  const openEdit = useCallback(() => {
+    setEditing(true)
+  }, [])
+
+  // 保存编辑资料（微信头像昵称）
+  const handleProfileSave = useCallback(async (nickname: string, avatar: string) => {
+    const token = Taro.getStorageSync('auth_token')
+    if (!token) {
+      Taro.showToast({ title: '请先登录', icon: 'none' })
+      return
+    }
+    try {
+      const res = await Network.request({
+        url: '/api/auth/userinfo',
+        method: 'PATCH',
+        header: { Authorization: `Bearer ${token}` },
+        data: { nickname, avatar },
+      })
+      console.log('更新资料:', res.data)
+      const user = res.data?.data
+      if (user) {
+        Taro.setStorageSync('user_info', JSON.stringify(user))
+        setUserInfo(user)
+        setEditing(false)
+        Taro.showToast({ title: '保存成功', icon: 'success' })
+      } else {
+        Taro.showToast({ title: '保存失败', icon: 'none' })
+      }
+    } catch (error) {
+      console.error('保存失败:', error)
+      Taro.showToast({ title: '保存失败', icon: 'none' })
+    }
+  }, [])
 
   // 页面加载时检查登录状态并获取订单
   useEffect(() => {
@@ -229,21 +266,36 @@ const ProfilePage = () => {
         <View className="bg-white px-4 pt-6 pb-5">
           <View className="flex items-center gap-3">
             {isLoggedIn && userInfo ? (
-              <>
-                <View className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center overflow-hidden">
-                  {userInfo.avatar ? (
-                    <Image src={userInfo.avatar} className="w-full h-full" mode="aspectFill" />
-                  ) : (
-                    <User size={28} color="#0D9488" />
-                  )}
-                </View>
-                <View className="flex-1">
-                  <Text className="block text-lg font-bold text-slate-800">{userInfo.nickname || '微信用户'}</Text>
-                  <Text className="block text-xs text-slate-400 mt-1">
-                    已登录，可查看所有预约
-                  </Text>
-                </View>
-              </>
+              editing ? (
+                // 编辑资料模式（微信头像昵称填写能力）
+                <UserProfileEditor
+                  isMiniApp={isMiniApp}
+                  initialNickname={userInfo.nickname || ''}
+                  initialAvatar={userInfo.avatar || ''}
+                  onSave={handleProfileSave}
+                  onCancel={() => setEditing(false)}
+                />
+              ) : (
+                // 已登录展示
+                <>
+                  <View className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center overflow-hidden">
+                    {userInfo.avatar ? (
+                      <Image src={userInfo.avatar} className="w-full h-full" mode="aspectFill" />
+                    ) : (
+                      <User size={28} color="#0D9488" />
+                    )}
+                  </View>
+                  <View className="flex-1">
+                    <Text className="block text-lg font-bold text-slate-800">{userInfo.nickname || '微信用户'}</Text>
+                    <Text className="block text-xs text-slate-400 mt-1">
+                      微信一键登录，可查看所有预约
+                    </Text>
+                  </View>
+                  <Button size="sm" variant="outline" className="rounded-lg" onClick={openEdit}>
+                    编辑
+                  </Button>
+                </>
+              )
             ) : (
               <>
                 <View className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center">
@@ -252,10 +304,10 @@ const ProfilePage = () => {
                 <View className="flex-1">
                   <Text className="block text-lg font-bold text-slate-800">未登录</Text>
                   <Text className="block text-xs text-slate-400 mt-1">
-                    登录后即可查看您的预约记录
+                    用微信一键登录，查看预约记录
                   </Text>
                 </View>
-                <Button size="sm" onClick={handleLogin}>登录</Button>
+                <Button size="sm" className="bg-teal-600 text-white rounded-lg" onClick={handleLogin}>微信一键登录</Button>
               </>
             )}
           </View>

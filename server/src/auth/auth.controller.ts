@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Headers, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Get, Headers, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -57,6 +57,35 @@ export class AuthController {
     return {
       code: 200,
       msg: 'success',
+      data: user,
+    };
+  }
+
+  /**
+   * 更新当前用户资料（头像/昵称）
+   * PATCH /api/auth/userinfo
+   * Header: Authorization: Bearer <token>
+   * Body: { nickname?, avatar? }
+   */
+  @Patch('userinfo')
+  @HttpCode(HttpStatus.OK)
+  async updateUserInfo(
+    @Headers('authorization') authHeader: string,
+    @Body() body: { nickname?: string; avatar?: string },
+  ) {
+    const token = this.extractToken(authHeader);
+    if (!token) {
+      return { code: 401, msg: '未登录', data: null };
+    }
+
+    const user = this.authService.updateUser(token, body.nickname, body.avatar);
+    if (!user) {
+      return { code: 401, msg: '登录已过期', data: null };
+    }
+
+    return {
+      code: 200,
+      msg: '更新成功',
       data: user,
     };
   }

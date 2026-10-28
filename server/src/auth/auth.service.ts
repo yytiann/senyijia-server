@@ -112,6 +112,25 @@ export class AuthService {
   }
 
   /**
+   * 更新当前用户资料（头像/昵称）
+   */
+  updateUser(token: string, nickname?: string, avatar?: string): User | null {
+    const openid = this.tokens.get(token);
+    if (!openid) return null;
+    const user = this.users.get(openid);
+    if (!user) return null;
+
+    if (nickname !== undefined) {
+      user.nickname = nickname.trim() || '微信用户';
+    }
+    if (avatar !== undefined) {
+      user.avatar = avatar.trim() || '';
+    }
+    this.users.set(openid, user);
+    return user;
+  }
+
+  /**
    * 调用微信 API 获取 openid
    * 生产环境需要配置 APP_ID 和 APP_SECRET
    */
